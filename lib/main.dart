@@ -1,15 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ha_assist_v2/ha.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:bonsoir/bonsoir.dart';
 
 void main() async {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  final GoRouter _router = GoRouter(
+    routes: [
+      GoRoute(
+        name: 'home',
+        path: '/',
+        builder: (context, state) => const MainScreen(),
+      ),
+      GoRoute(
+        name: 'ha',
+        path: '/ha',
+        builder: (context, state) => const HAInstances(),
+      )
+    ],
+  );
 
   // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerConfig: _router,
+      title: 'Main Page',
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -34,7 +63,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter Page'),
     );
   }
 }
@@ -60,24 +89,26 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late SpeechToText _speech;
   late bool _isListening = false;
-  late BonsoirDiscovery _mdnsService;
+  //late BonsoirDiscovery _mdnsService;
   String _text = 'Press the button and start speaking...';
   // This is the type of service we're looking for :
   //final String _type = '_services._dns-sd._udp';
-  final String _type = '_home-assistant._tcp';
-  bool _ismdnsServiceReady = false;
+  //final String _type = '_home-assistant._tcp';
+  //bool _ismdnsServiceReady = false;
 
   @override
   void initState() {
     super.initState();
     _speech = SpeechToText();
     _isListening = true;
-    _mdnsService = BonsoirDiscovery(type: _type);
+    //_mdnsService = BonsoirDiscovery(type: _type);
   }
 
+  /*
   void mdnsReady() async {
     await _mdnsService.ready;
   }
+  */
 
   void startListening() {}
 
@@ -121,6 +152,10 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
+                onPressed: () => context.goNamed('ha'),
+                child: const Text("Find HA")),
+            /*
+            ElevatedButton(
                 onPressed: () async {
                   if (!_mdnsService.isReady) {
                     await _mdnsService.ready;
@@ -143,10 +178,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                 },
                 child: const Text("Refresh MDNS List")),
+            */
+
             Text(
               _text,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+
+            /*
             StreamBuilder(
                 stream: _mdnsService.eventStream,
                 builder: (context, snapshot) {
@@ -172,9 +211,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                   return const Text("no data");
                 })
+            */
           ],
         ),
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: _listen,
